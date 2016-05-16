@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<html>
+
+<!--
+  pgn4web javascript chessboard
+  copyright (C) 2009-2015 Paolo Casaschi
+  see README file and http://pgn4web.casaschi.net
+  for credits, license and more details
+-->
+
+<head>
+<title>live TV</title>
+<link rel="icon" sizes="16x16" href="favicon.ico" />
+
+<!-- use viewport settings when body.onresize adapts the chessboard to the available space -->
+<meta name="viewport" content="initial-scale=1, maximum-scale=1">
+
+<link href="pgn4web/fonts/pgn4web-font-LiberationSans.css" type="text/css" rel="stylesheet" />
+<link href="pgn4web/fonts/pgn4web-font-ChessSansMerida.css" type="text/css" rel="stylesheet" />
+
+<style id="dynamicStyle" type="text/css"></style>
+
+<!-- AppCheck: fonts -->
+
+<script src="pgn4web/pgn4web.js" type="text/javascript"></script>
+<script src="pgn4web/engine.js" type="text/javascript"></script>
+<script src="pgn4web/fide-lookup.js" type="text/javascript"></script>
+<script src="js/live-TV.js"></script>
+
+</head>
+
+<body onResize="myOnResize();" onLoad="myOnResize();">
+
+<!-- paste your PGN below and make sure you dont specify an external source with SetPgnUrl() -->
+<form style="display:none;"><textarea style="display:none;" id="pgnText">
+
+</textarea></form>
+<!-- paste your PGN above and make sure you dont specify an external source with SetPgnUrl() -->
+
+<div style="display:none;" id="GameSelector"></div>
+
+<div class="gameList" style="display:none;" id="GameList">
+<div class="gameListHeader" id="GameListHeader"><div class="gameListHeaderItem"><span class="gameListHeaderButton" onclick="selectGameList(-1);" title="back to chessboard">&lt;=</span></div><div class="gameListHeaderItem"><span class="gameListHeaderButton" onclick="autoscrollGameListBody(0); this.blur();" title="scroll to first page">&lt;&lt;</span></div><div class="gameListHeaderItem"><span class="gameListHeaderButton" onclick="if (theObj = document.getElementById('GameListBody')) { autoscrollGameListBody(Math.floor(theObj.scrollTop / gameListLineHeight) - gameListNumGames); } this.blur();" title="scroll to previous page">&lt;</span></div><div class="gameListHeaderItem"><span class="gameListHeaderButton" onclick="autoscrollGameListBody(-1); this.blur();" title="scroll to current game">&gt;&lt;</span></div><div class="gameListHeaderItem"><span class="gameListHeaderButton" onclick="if (theObj = document.getElementById('GameListBody')) { autoscrollGameListBody(Math.floor(theObj.scrollTop / gameListLineHeight) + gameListNumGames); } this.blur();" title="scroll to next page">&gt;</span></div><div class="gameListHeaderItem"><span class="gameListHeaderButton" onclick="autoscrollGameListBody(numberOfGames); this.blur();" title="scroll to last page">&gt;&gt;</span></div><div class="gameListHeaderItem"><span class="gameListHeaderButton" onclick="toggleGameListHorizontalScroll(); this.blur();" title="horizontal scroll">&lt;&gt;</span></div></div>
+<div class="gameListBody" id="GameListBody"><div class="gameListBodyItems" id="GameListBodyItems"></div></div>
+</div>
+
+<div id="GameBoard"></div>
+
+<!--
+<div id="HeaderContainer" class="headerContainer">
+<div class="firstVariableSpacer">&nbsp;</div>
+<div>&nbsp;<span id="GameSite" title="site"></span><span id="GameDate" title="date"></span>&nbsp;</div>
+<div>&nbsp;<span style="cursor:pointer;" onclick="searchNextEventRound(event.shiftKey); this.blur();"><span id="GameEvent" title="event"></span><span id="GameSection" title="section"></span><span id="GameStage" title="stage"></span><span id="GameRound" title="round"></span></span>&nbsp;</div>
+-->
+<!-- Black player informations -->
+<div>&nbsp;<span id="GameBlack" style="font-weight:bold; cursor:pointer;" onclick="searchPlayer(this.innerHTML, customPgnHeaderTag('BlackFideId')); this.blur();" title="black player"></span><span id="GameBlackTitle" title="black title"></span><span id="GameBlackElo" title="black elo"></span><span id="GameBlackTeam" title="black team"></span><span style="font-weight:bold;">&nbsp;</span></div>
+<div>&nbsp;<span id="GameBlackClockLine"><span style="display:inline-block;" title="black to move"><span class="colorFlag" style="background:black; display:none;" id="blackColorFlag"></span></span><span id="GameBlackClock" style="cursor:pointer;" onclick="if (!showColorFlag) { toggleColorFlag(); setTimeout('if (showColorFlag) { toggleColorFlag(); }', 1111); } this.blur();" title="black clock"></span><span style="display:inline-block;"><span class="colorFlag" style="background:black; display:none;" id="blackColorFlagFiller"></span></span></span>&nbsp;</div>
+<!-- End Black player informations -->
+
+<div class="variableSpacer">&nbsp;</div>
+<div class="variableSpacer">&nbsp;</div>
+<center><span>Festival Nancy 2016</span></center>
+<div class="variableSpacer">&nbsp;</div>
+<div>&nbsp;<span id="GameResultLine"><span id="GameECOFiller" style="visibility:hidden; padding-right:2.5em;"></span><span id="GameResult" style="font-weight:bold; cursor:pointer;" onclick="if (!showEco) { toggleShowEco(); setTimeout('if (showEco) { toggleShowEco(); }', 1111); } this.blur();" title="result"></span><span style="padding-left:2.5em;" id="GameECO"></span></span><span style="font-weight:bold;">&nbsp;</span></div>
+<div class="variableSpacer">&nbsp;</div>
+<div class="leftRightSpacing">&nbsp;<span id="GamePrevMoves" style="cursor:pointer;" onclick="GoToMove(CurrentPly - 1); this.blur();" title="previous moves"></span><span id="GameCurrMove" style="font-weight:bold; cursor:pointer;" onclick="if (!highlightOption) { SetHighlight(!highlightOption); setTimeout('if (highlightOption) { SetHighlight(!highlightOption); }', 1111); } this.blur();" title="current move as shown on chessboard"></span><span id="GameNextMoves" style="cursor:pointer;" onclick="GoToMove(CurrentPly + 1); this.blur();" title="next moves"></span><span style="font-weight:bold;">&nbsp;</span></div>
+<!-- des trucs dont on a pas besoin a-piori
+<center><div id="GameButtons" class="leftRightSpacing gameButtons"></div></center>
+<div class="liveStatusLine">&nbsp;<span id="GameLiveStatusExtraInfoLeft" class="leftRightSpacing gameLiveStatusExtraInfoLeft" style="visibility:hidden;"></span><span id="GameLiveStatus" class="leftRightSpacing" style="cursor:pointer;"></span><span id="GameLiveStatusExtraInfoRight" class="leftRightSpacing" style="visibility:hidden;"></span>&nbsp;</div>-->
+<center><div id="ShowGameList" class="leftRightSpacing" style="visibility:hidden;">&nbsp;<span id="ShowGameListLink" class="showGameListLink" style="cursor:pointer;" onclick="showGameList();"></span>&nbsp;</div></center>
+<div class="variableSpacer">&nbsp;</div>
+<div class="variableSpacer">&nbsp;</div>
+<div class="variableSpacer">&nbsp;</div>
+<div class="variableSpacer">&nbsp;</div>
+
+<!-- White player informations -->
+<div>&nbsp;<span id="GameWhiteClockLine"><span style="display:inline-block;" title="white to move"><span class="colorFlag" style="background:white; display:none;" id="whiteColorFlag"></span></span><span id="GameWhiteClock" style="cursor:pointer;" onclick="if (!showColorFlag) { toggleColorFlag(); setTimeout('if (showColorFlag) { toggleColorFlag(); }', 1111); } this.blur();" title="white clock"></span><span style="display:inline-block;"><span class="colorFlag" style="background:white; display:none;" id="whiteColorFlagFiller"></span></span></span>&nbsp;</div>
+<div>&nbsp;<span id="GameWhite" style="font-weight:bold; cursor:pointer;" onclick="searchPlayer(this.innerHTML, customPgnHeaderTag('WhiteFideId')); this.blur();" title="white player"></span><span id="GameWhiteTitle" title="white title"></span><span id="GameWhiteElo" title="white elo"></span><span id="GameWhiteTeam" title="white team"></span><span style="font-weight:bold;">&nbsp;</span></div>
+<!-- End White player informations -->
+
+<script type="text/javascript">
+"use strict";
+
+var theObj;
+
+if (LiveBroadcastDelay && LiveBroadcastDemo) {
+  if (theObj = document.getElementById("GameLiveStatusExtraInfoRight")) {
+    theObj.innerHTML = "demo";
+    theObj.title = "this is a broadcast simulation";
+    theObj.style.visibility = "visible";
+  }
+  if (theObj = document.getElementById("GameLiveStatusExtraInfoLeft")) {
+    theObj.innerHTML = "demo";
+  }
+}
+
+<!-- AppCheck: footer -->
+
+</script>
+
+</body>
+
+</html>
