@@ -1,4 +1,4 @@
-getRelease("galuel","applets-pgn4web","applets_releases");
+getRelease("galuel","applets-pgn4web","applets-releases");
 function getRelease(user, repo, Id) {
    var xmlhttp = new XMLHttpRequest();
    xmlhttp.onreadystatechange = function() {
