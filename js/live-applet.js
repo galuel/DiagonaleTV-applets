@@ -66,3 +66,24 @@ function customFunctionOnPgnGameLoad() {
   if (theObj = document.getElementById('GameVariation')) { theObj.innerHTML = fixCommentForDisplay(theObj.innerHTML); }
   customPgnHeaderTag('Result', 'ResultAtGametextEnd');
 }
+
+function SwitchToAnalysis() {
+	var modeech=document.getElementById("bouton").innerHTML;
+	if (modeech=="analyse") {
+		var fenpos=CurrentFEN();
+                document.getElementById("echiquieranalyse").innerHTML = "<iframe src='pgn4web/engine.html"+"?fs="+fenpos+"&backgroundColorHex=FFFFFF&darkColorHex=cc9966&lightColorHex=ffcc99&squareSize=40&disableEngine=true&framePaddingRatio=0' width=360 height=360 frameborder=0 style='display:block; margin-left:12px;'></iframe>";
+		document.getElementById("echiquieranalyse").style.display = "block"; //affiche echiquier d'analyse
+		document.getElementById("GameBoard").style.display = "none"; //efface echiquier du live
+		document.getElementById("bouton").innerHTML = "live"; //pour pouvoir reswitcher au live ensuite
+	}
+	else
+	{
+		SwitchToLive();
+	}
+}
+
+function SwitchToLive() {
+	document.getElementById("echiquieranalyse").style.display = "none"; //efface echiquier d'analyse
+	document.getElementById("GameBoard").style.display = "block"; //affiche echiquier du live
+	document.getElementById("bouton").innerHTML = "analyse"; //pour pouvoir reswitcher en analyse ensuite
+}
