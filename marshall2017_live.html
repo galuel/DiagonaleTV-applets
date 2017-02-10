@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<!--
+  pgn4web javascript chessboard
+  copyright (C) 2009-2015 Paolo Casaschi
+  see README file and http://pgn4web.casaschi.net
+  for credits, license and more details
+-->
+<!--
+  applet pgn4web adaptation by diagonaleTV check https://github.com/galuel/applets-pgn4web
+-->
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf8">
+
+<title>Final Four 2017</title>
+
+<link href="css/live-applet.css" type="text/css" rel="stylesheet">
+<link href="pgn4web/fonts/pgn4web-font-LiberationSans.css" type="text/css" rel="stylesheet">
+<link href="pgn4web/fonts/pgn4web-font-ChessSansMerida.css" type="text/css" rel="stylesheet">
+
+<link rel="icon" sizes="16x16" href="favicon.ico">
+
+<script src="pgn4web/pgn4web.js" type="text/javascript"></script>
+<script src="pgn4web/engine.js" type="text/javascript"></script>
+<script src="pgn4web/fide-lookup.js" type="text/javascript"></script>
+<script src="js/live-applet.js" type="text/javascript"></script>
+
+<style> 
+#GameText {
+          height: 340px;
+          overflow: auto;
+         }
+</style> 
+</head>
+
+<body style="margin-top:px;margin-left:20px;margin-right:0;">
+<table cellpadding=0 cellspacing=2 width="910">
+<tr>
+<td><h2>Final Four of College Chess 2017, March 25-26, Marshall Chess Club</h2></td>
+<td><div class="label" style="float: right; font-size: 66%; color: white;">partie:<span id="currGm">1</span>/<span id="numGm">5</span></div></td>
+</tr>
+</table>
+
+<table cellpadding=0 cellspacing=2 width="910">
+<tr>
+<td><img src="logos/logomarshall.jpg" height=80px></td>
+<td><img src="logos/logomarshall.jpg" height=80px></td>
+<td><img src="logos/logomarshall.jpg" height=80px></td>
+<td><img src="logos/logomarshall.jpg" height=80px></td>
+<td><img src="logos/logomarshall.jpg" height=80px></td>
+</tr>
+</table>
+
+<table cellpadding="0" cellspacing="2" width="910">
+<tr>
+<!-- video stream -->
+<td>
+<div id="Video"><iframe width="600" height="260" src="https://www.youtube.com/embed/BLZhZqNzQQk?list=PLblBYAG9k8WF-ME-R_l6P1O5d-W9ucQRz" frameborder="0" allowfullscreen></iframe></div>
+</td>
+<!-- end of video stream -->
+<!-- Vertical chessboards -->
+<td rowspan="7">
+<iframe src="marshall2017_live-mosaic-frame.html" height="800" width="340" valign="top" name="board1" scrolling=auto frameborder="0" marginwidth="0" marginheight="0"></iframe>
+</td>
+<!-- end of vertical chessboards -->
+</tr>
+<!-- principal board -->
+<tr>
+<td>
+  <table>
+  <tr>
+  <!-- black information -->
+  <td width="240">
+  <span id="GameBlackTitle" title="black title"></span>&nbsp;<span id="GameBlack" style="font-weight:bold; cursor:pointer;" onclick="searchPlayer(this.innerHTML, customPgnHeaderTag('BlackFideId')); this.blur();" title="black player"></span>&nbsp;&nbsp;<span id="GameBlackElo" title="black elo"></span>
+  </td>
+  <td width="60"><span align="right" id="GameBlackClock"></span></td>
+  <!-- end of black information -->
+  <!-- Right of the board, moves, result -->
+  <td valign="top"rowspan="5">
+  <br>
+  <div style="font-size: 85%; text-align: justify; padding-top:5px;" id="GameText"></div>
+  <table>
+  <tr>
+  <td width="240"><span class="label">Result : </span><span style="font-weight: bold;"><span id="GameResult"></span></span>&nbsp;</td>
+  <td width="208" align="right"><a href="livepgn/live.pgn"><div style="font-size: 85%; color:blue;">PGN</div></a></td>
+  </tr>
+  <tr>
+  <td colspan = 2 align="right">
+  <div align="right" style="font-size: 85%;">&nbsp;<a href="http://agen2016.ffechecs.org" target="_blank"><span style="color:blue;">Classement du tournoi A</span></a> | <a href="http://agen2016.ffechecs.org/" target="_blank"><span style="color:blue;">Site officiel</span></a></div>
+  </td>
+  </tr>
+  </table>
+  </td>
+  <!-- End of right of the board, moves, result -->
+  </tr>  
+  <tr>
+  <!-- board -->
+  <td colspan="2" width="362" style="position:relative;">
+  <div id="GameBoard" style="display:block; margin-left:12px;"></div>
+  <div id="echiquieranalyse" style="display:none;"><iframe src="pgn4web/engine.html" width=360 height=360 frameborder=0 style="display:block; margin-left:12px;"></iframe></div>
+  <!-- images des coordonnees (dépendent de la taille des cases) -->
+  <div id="imgcoord">
+  <img id="coord-vert" src="images/coord-vertical.png" width="12" height="353" border="0" style="position: absolute; left: 1px; top: 2px;">
+  <img id="coord-hori" src="images/coord-horizontal.png" width="355" height="14" border="0" style="position: absolute; left: 15px; top: 358px;">
+  </div>
+  <!-- fin coordonnees-->
+  </td>
+  <!-- end of board -->
+  </tr>
+  <tr>
+  <!-- white information -->
+  <td width="240" height="40">
+  <span id="GameWhiteTitle" title="White title"></span>&nbsp;<span id="GameWhite" style="font-weight:bold; cursor:pointer;" onclick="searchPlayer(this.innerHTML, customPgnHeaderTag('WhiteFideId')); this.blur();" title="White player"></span>&nbsp;&nbsp;<span id="GameWhiteElo" title="White 	elo"></span>
+  </td>
+  <td width="60"><span align="right" id="GameWhiteClock"></span></td>
+  </td>
+  <!-- end of white information -->
+  </tr>
+  <tr>
+  <!-- Game Buttons -->
+  <td colspan="2" align="center"><div id="GameButtons"></div></td>
+  <!-- End of Game Buttons -->
+  </tr>
+  <tr>
+  <!-- game Selector -->
+  <td colspan="2" align="center"><div id="GameSelector"></div></td>
+  <!-- end of game Selector -->
+  </tr>
+  <tr>
+  <!-- Analyse switch button -->
+  <td colspan="2" align="right"><div align="right" style="font-size:12px"><a href="#"><span id="bouton" onclick="SwitchToAnalysis();">analyse</span></a></div></td>
+  <!-- end of analyse switch button -->
+  </tr>
+  </table>
+</body>
+</html>

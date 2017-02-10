@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html>
+<!-- Free pgn4web template under General Public Licence see https://www.gnu.org/licenses/gpl.html Offical repositery in https://github.com/galuel/applets-pgn4web -->
+<!--
+  pgn4web javascript chessboard
+  copyright (C) 2009-2015 Paolo Casaschi
+  see README file and http://pgn4web.casaschi.net
+  for credits, license and more details
+-->
+
+<head>
+<title>Nancy 2016 Live</title>
+<link rel="icon" sizes="16x16" href="favicon.ico" />
+
+<link href="css/live-applet.css" type="text/css" rel="stylesheet" />
+<link href="pgn4web/fonts/pgn4web-font-LiberationSans.css" type="text/css" rel="stylesheet" />
+<link href="pgn4web/fonts/pgn4web-font-ChessSansMerida.css" type="text/css" rel="stylesheet" />
+
+<link rel="icon" sizes="16x16" href="king.ico" />
+
+<script src="pgn4web/pgn4web.js" type="text/javascript"></script>
+<script src="pgn4web/engine.js" type="text/javascript"></script>
+<script src="pgn4web/fide-lookup.js" type="text/javascript"></script>
+<script src="js/live-applet.js" type="text/javascript"></script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+<!-- paste your PGN below and make sure you dont specify an external source with SetPgnUrl() -->
+<form style="display: none;"><textarea style="display: none;" id="pgnText">
+
+</textarea></form>
+<!-- paste your PGN above and make sure you dont specify an external source with SetPgnUrl() -->
+
+<div class="label" style="text-align: right; font-size: 66%;">game:<span id=currGm>0</span>/<span id=numGm>0</span></div>
+
+<table cellpadding=0 cellspacing=0 align=center width="762">
+<tr valign="center">
+<td><a href="http://www.meurthe-et-moselle.fr/"><img src="http://festivalnancy.echecs54.org/live/logos/Logo_cd54.jpg" height="80"></img></a></td>
+<td><a href="http://echecs54.org/"><img src="http://festivalnancy.echecs54.org/live/logos/Logo_echecs54.jpg" height="80"></img></a></td>
+<td><a href="http://www.echecs.asso.fr"><img src="http://festivalnancy.echecs54.org/live/logos/Logo_FFE.jpg" height="80"></img></a></td>
+<td><a href="http://www.diagonaletv.com"><img src="http://festivalnancy.echecs54.org/live/logos/Logo_DiagonaleTV.png" height="80"></img></a></td>
+</tr>
+</table>
+<table cellpadding=0 cellspacing=4 align=center>
+<tr valign=top width="342">
+<td width="282">
+<span id="GameBlackTitle" title="black title"></span>&nbsp;<span id="GameBlack" style="font-weight:bold; cursor:pointer;" onclick="searchPlayer(this.innerHTML, customPgnHeaderTag('BlackFideId')); this.blur();" title="black player"></span>&nbsp;&nbsp;<span id="GameBlackElo" title="black elo"></span>
+</td>
+<td width=60 align=right>
+<span id="GameBlackClock"></span>
+</td>
+<tr valign=top width="342">
+<td width="342" colspan="2">
+<div id="GameBoard"></div>
+</td>
+<td>
+<iframe width="400" height="226" src="https://www.youtube.com/embed/C6P3uI2PQb0" frameborder="0" allowfullscreen></iframe>
+</td>
+</tr>
+<tr valign=top width="342">
+<td width="282">
+<span id="GameWhiteTitle" title="White title"></span>&nbsp;<span id="GameWhite" style="font-weight:bold; cursor:pointer;" onclick="searchPlayer(this.innerHTML, customPgnHeaderTag('WhiteFideId')); this.blur();" title="White player"></span>&nbsp;&nbsp;<span id="GameWhiteElo" title="White elo"></span>
+</td>
+<td width=60 align=right>
+<span id="GameWhiteClock"></span>
+</td>
+</tr>
+<tr valign=top width="342">
+<td colspan="2">
+<p></p>
+<div id="GameButtons"></div>
+<div id="GameSelector"></div>
+<hr>
+<div style="font-size: 85%; text-align: justify;" id="GameText"></div>
+</td>
+</tr>
+<tr>
+<td>
+<span class="label">R&eacute;sultat : </span><span id="GameResult"></span>
+</td>
+</tr>
+</table>
+
+</body>
+
+</html>
