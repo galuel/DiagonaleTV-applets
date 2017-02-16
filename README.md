@@ -2,7 +2,8 @@
 
 DiagonaleTV applets HTML5 + js for pgn4web copyright DiagonaleTV GPL v3 http://www.diagonaletv.com, github : https://github.com/galuel/DiagonaleTV-applets
 
-This code is licensed under GPL v3 licence https://www.gnu.org/licenses/licenses.en.html.
+Copyright (C) GPLv3 2016-2017 www.diagonaletv.com
+GPLv3 https://www.gnu.org/licenses/gpl.html
 
 Logos are not free and are used with persmission as examples.
 
