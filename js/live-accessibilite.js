@@ -1,6 +1,6 @@
    "use strict";
 
-   SetPgnUrl("livepgn/live.pgn"); // enable this one for real live broadcast using the live-grab.sh script
+   SetPgnUrl("livepgn/games.pgn"); // enable this one for real live broadcast using the live-grab.sh script
 // SetPgnUrl("demoLiveGames.pgn"); // enable this one for live broadcast demo
 
    SetImagePath("pgn4web/images");

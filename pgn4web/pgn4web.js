@@ -7,7 +7,7 @@
 
 "use strict";
 
-var pgn4web_version = '3.00';
+var pgn4web_version = '3.02';
 
 var pgn4web_project_url = "http://pgn4web.casaschi.net";
 var pgn4web_project_author = "Paolo Casaschi";
@@ -79,7 +79,6 @@ function start_pgn4web() {
   else { resetAlert(); }
   InitImages();
   createBoard();
-  if (LiveBroadcastDelay > 0) { restartLiveBroadcastTimeout(); }
   pgn4web_initTouchEvents();
 }
 
@@ -1652,6 +1651,7 @@ function updatePgnFromHttpRequest(this_http_request, this_http_request_id) {
   if (this_http_request_id < http_request_last_processed_id) { return; }
   else { http_request_last_processed_id = this_http_request_id; }
 
+  // patch: enable loading local PGN files on some browsers by adding: || (this_http_request.status === 0)
   if ((this_http_request.status == 200) || (this_http_request.status == 304)) {
 
     if (this_http_request.status == 304) {
@@ -1887,7 +1887,7 @@ function checkLiveBroadcastStatus() {
     theTitle = LiveBroadcastEnded ? "live broadcast ended" : LiveBroadcastPaused ? "live broadcast paused" : lbgr + " live game" + (lbgr == 1 ? "" : "s") + " out of " + numberOfGames;
   }
   theHTML = LiveBroadcastEnded ? "#" : LiveBroadcastPaused ? "+" : "=";
-  theHTML = (LiveBroadcastTicker % 4 === 0 ? theHTML : "&nbsp;") + (LiveBroadcastTicker % 2 === 1 ? theHTML : "&nbsp;") + (LiveBroadcastTicker % 4 === 2 ? theHTML : "&nbsp;");
+  theHTML = (LiveBroadcastTicker % 4 === 3 ? theHTML : "&nbsp;") + (LiveBroadcastTicker % 2 === 0 ? theHTML : "&nbsp;") + (LiveBroadcastTicker % 4 === 1 ? theHTML : "&nbsp;");
   theHTML = LiveBroadcastGamesRunning + "<span style='display:inline-block; min-width:3em; text-align:center;'>" + theHTML + "</span>" + numberOfGames;
   theHTML = "<span onclick='" + (LiveBroadcastPaused ? "restartLiveBroadcast();" : "refreshPgnSource();") + " this.blur();'>" + theHTML + "</span>";
 

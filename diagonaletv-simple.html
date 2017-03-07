@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<!-- DiagonaleTV-applets for pgn4web
+     copyright (C) GPLv3 2016-2017 http://www.diagonaletv.com
+     see README file for credits, licence and more details
+-->
+<!--
+  pgn4web javascript chessboard
+  copyright (C) 2009-2015 Paolo Casaschi
+  see README file and http://pgn4web.casaschi.net
+  for credits, license and more details
+-->
+<head>
+<meta charset="UTF-8">
+<title>DiagonaleTV simple</title>
+<!-- favicon -->
+<link rel="icon" sizes="16x16" href="favicon.ico">
+<!-- css files -->
+<link href="css/live-applet.css" type="text/css" rel="stylesheet">
+<link href="pgn4web/fonts/pgn4web-font-LiberationSans.css" type="text/css" rel="stylesheet">
+<link href="pgn4web/fonts/pgn4web-font-ChessSansMerida.css" type="text/css" rel="stylesheet">
+<!-- javascript files -->
+<script src="pgn4web/pgn4web.js"></script>
+<script src="pgn4web/engine.js"></script>
+<script src="pgn4web/fide-lookup.js"></script>
+<script src="js/live-applet.js"></script>
+<script type="text/javascript">
+ if (window!= window.top) { // inside iframe
+   document.body.style.backgroundColor = 'transparent';
+   // or document.body.style.background = 'none';
+ }
+</script>
+</head>
+
+<body style="background-color: transparent;">
+<!-- chessboard -->
+<table cellpadding=0 cellspacing=2 border="0" width="388">
+<tr>
+<td width="300"><span id="GameBlackTitle" title="black title"></span>&nbsp;<span id="GameBlack" style="font-weight:bold; cursor:pointer;" onclick="searchPlayer(this.innerHTML, customPgnHeaderTag('BlackFideId')); this.blur();" title="black player"></span>&nbsp;&nbsp;<span id="GameBlackElo" title="black elo"></span></td>
+<td width="62" align="right"><span id="GameBlackClock"></span></td>
+<td></td>
+</tr>
+<tr valign="top">
+<td colspan="3" style="position:relative;" height="374">
+<table border="0">
+<tr height="42" valign=center>
+<td width="14">8</td>
+<td rowspan="8">
+<div id="GameBoard" style="display:block;"></div>
+<div id="echiquieranalyse" style="display:none;"><iframe src="pgn4web/engine.html" width=360 height=360 frameborder=0 style="display:block; margin-left:12px;"></iframe></div>
+</td>
+<td rowspan="8" width="42">
+<table border="0">
+<tr height="42" valign=center><td style="padding:0; margin:0;"><img src="images/blackflag.png" style="width:40; height:40; visibility:hidden;" id="blackColorFlag"></td></tr>
+<tr height=42 valign=center><td></td></tr>
+<tr height=42 valign=center><td></td></tr>
+<tr height=42 valign=bottom><td><span style="font-size: 100%; float: left;" id="GameLastMove"></span></td></tr>
+<tr height=42 valign=bottom><td><span id="GameResult" style="font-weight: bold;"></span></td></tr>
+<tr height=42 valign=center><td><div class="label" style="float: right; font-size: 100%; color: white; visibility:hidden;">partie:<span id="currGm">1</span>/<span id="numGm">5</span></div></td></tr>
+<tr height=42 valign=center><td></td></tr>
+<tr height=42 valign=center><td style="padding:0; margin:0;"><img src="images/whiteflag.png" style="width:40; height:40; visibility:visible;" id="whiteColorFlag"></td></tr>
+</table>
+</td>
+</tr>
+<tr height=42 valign=center><td width="14">7</td></tr>
+<tr height=42 valign=center><td width="14">6</td></tr>
+<tr height=42 valign=center><td width="14">5</td></tr>
+<tr height=42 valign=center><td width="14">4</td></tr>
+<tr height=42 valign=center><td width="14">3</td></tr>
+<tr height=42 valign=center><td width="14">2</td></tr>
+<tr height=42 valign=center><td width="14">1</td></tr>
+</table>
+<table>
+<tr height="14" valign="center">
+<td width="14" align=center></td>
+<td width=42 align=center>a</td>
+<td width=42 align=center>b</td>
+<td width=42 align=center>c</td>
+<td width=42 align=center>d</td>
+<td width=42 align=center>e</td>
+<td width=42 align=center>f</td>
+<td width=42 align=center>g</td>
+<td width=42 align=center>h</td>
+</tr>
+</table>
+</tr>
+<tr valign="top">
+<td width="300"><span id="GameWhiteTitle" title="White title"></span>F<span id="GameWhite" style="font-weight:bold; cursor:pointer;" onclick="searchPlayer(this.innerHTML, customPgnHeaderTag('WhiteFideId')); this.blur();" title="White player"></span>&nbsp;&nbsp;<span id="GameWhiteElo" title="White Elo"></span></td>
+<td width="60" align="right"><span id="GameWhiteClock"></span></td>
+</tr>
+</table>
+<!-- end of chessboard chessboard -->
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<!-- DiagonaleTV-applets for pgn4web
+     copyright (C) GPLv3 2016-2017 http://www.diagonaletv.com
+     see README file for credits, licence and more details
+-->
+<!--
+  pgn4web javascript chessboard
+  copyright (C) 2009-2015 Paolo Casaschi
+  see README file and http://pgn4web.casaschi.net
+  for credits, license and more details
+-->
+<head>
+<meta charset="UTF-8">
+<title>Accessibilité</title>
+<!-- favicon -->
+<link rel="icon" sizes="16x16" href="favicon.ico">
+<!-- css files -->
+<link href="css/live-applet.css" type="text/css" rel="stylesheet">
+<link href="pgn4web/fonts/pgn4web-font-LiberationSans.css" type="text/css" rel="stylesheet">
+<link href="pgn4web/fonts/pgn4web-font-ChessSansMerida.css" type="text/css" rel="stylesheet">
+<style type="text/css">
+div.scrollable {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+}
+</style>
+<!-- javascript files -->
+<script src="pgn4web/pgn4web.js"></script>
+<script src="pgn4web/engine.js"></script>
+<script src="pgn4web/fide-lookup.js"></script>
+<script src="js/live-accessibilite.js"></script>
+<script>
+window.setInterval(function() {
+  var elem = document.getElementById('GameText');
+  elem.scrollTop = elem.scrollHeight;
+}, 5000);
+</script>
+</head>
+<body onload="setAudioVolume();">
+<table cellpadding=0 cellspacing=0>
+<tr>
+<td><button onclick="document.getElementById('FENText').focus();">FEN</button></td><td><button onclick="document.getElementById('GameResult').focus();">Résultat</button></td><td><button onclick="download('PGN-partie.pgn',fullPgnGame(currentGame));">Télécharger PGN-partie</button></td><td><button onclick="savePgnData();">Télécharger PGN-ronde</button></td>
+</tr>
+</table>
+<input type="text" id="FENText" size="80" onfocus="this.setSelectionRange(0,0);"></input>
+<table cellpadding=0 cellspacing=0>
+<tr valign=top>
+<td width="360" height="380" style="position:relative;">
+<div id="GameBoard" style="display:block; margin-left:13px;"></div>
+<!-- images des coordonnees, dépendent de la taille des cases-->
+<div id="imgcoord">
+<img id="coord-vert" src="images/coord-vertical.png" width="12" height="352" border="0" style="position: absolute; left: 1px; top: 2px;">
+<img id="coord-hori" src="images/coord-horizontal.png" width="352" height="15" border="0" style="position: absolute; left: 15px; top: 360px;">
+</div>
+</td>
+<td height="180">
+<div><span style="font-size: 100%; text-align: left;">Noirs - </span><span id="GameBlackClock"></span><span class="label" style="font-size: 100%; text-align: left;"> - </span><span id="GameBlackTitle" title="black title"></span>&nbsp;<span id="GameBlack" style="font-weight:bold; cursor:pointer;" onclick="searchPlayer(this.innerHTML, customPgnHeaderTag('BlackFideId')); this.blur();" title="black player"></span>&nbsp;&nbsp;<span id="GameBlackElo" title="black elo"></span></div>
+<hr>
+<div class="label" style="text-align: right; font-size: 50%;">game:<span id=currGm>0</span>/<span id=numGm>0</span></div>
+<div class="scrollable" style="font-size: 100%; text-align: justify;" id="GameText"></div>
+<div><span class="label" style="font-size: 100%; text-align: justify;">Résultat : </span><input type="text" id="GameResult" size="3" onfocus="this.setSelectionRange(0,0);"></input></div>
+<div id="GameButtons"></div>
+<div id="GameSelector"></div>
+<hr>
+<div><span style="font-size: 100%; text-align: left;">Blancs - </span><span id="GameWhiteClock"></span><span class="label" style="font-size: 100%; text-align: left;"> - </span><span id="GameWhiteTitle" title="White title"></span>&nbsp;<span id="GameWhite" style="font-weight:bold; cursor:pointer;" onclick="searchPlayer(this.innerHTML, customPgnHeaderTag('WhiteFideId')); this.blur();" title="White player"></span>&nbsp;&nbsp;<span id="GameWhiteElo" title="White elo"></span>
+</td>
+</tr>
+</table>
+<audio controls="" id="audioClick">
+  <source src="audio/click.wav" type="audio/wav">
+Votre navigateur ne supporte pas la balise audio. Utilisez Firefox.
+</audio> 
+</body>
+</html>

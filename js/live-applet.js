@@ -1,13 +1,13 @@
    "use strict";
 
-   SetPgnUrl("livepgn/live.pgn"); // enable this one for real live broadcast using the live-grab.sh script
+   SetPgnUrl("livepgn/games.pgn"); // enable this one for real live broadcast using the live-grab.sh script
 // SetPgnUrl("demoLiveGames.pgn"); // enable this one for live broadcast demo
 
    SetImagePath("pgn4web/images");
 // SetImageType("png");
-   SetHighlightOption(false); // true or false
+   SetHighlightOption(true); // true or false
 
-   SetGameSelectorOptions(null, true, 0, 0, 0, 15, 15, 3, 0); // (head, num, chEvent, chSite, chRound, chWhite, chBlack, chResult, chDate);
+   SetGameSelectorOptions("Liste des parties", true, 0, 0, 0, 15, 15, 3, 0); // (head, num, chEvent, chSite, chRound, chWhite, chBlack, chResult, chDate);
 
    SetCommentsIntoMoveText(false);
    SetCommentsOnSeparateLines(false);
@@ -27,6 +27,8 @@
    // set live broadcast; parameters are delay (refresh delay in minutes, 0 means no broadcast, default 0) alertFlag (if true, displays debug error messages, default false, this flag highlight top left square put it to false to stop this) demoFlag (if true starts broadcast demo mode, default false) stepFlag (if true, autoplays updates in steps, default false) endlessFlag (if true, keeps polling for new moves even after all games are finished)
    SetLiveBroadcast(0.25, false, false);  // enable this one for real live broadcast
 // SetLiveBroadcast(0.25, true, true); // enable this one for live broadcast demo
+
+   var showColorFlag=true;
 
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;
@@ -48,6 +50,20 @@ function getParameterByName(name, url) {
 
 function searchPlayer(name, FideId) {
   if (typeof(openFidePlayerUrl) == "function") { openFidePlayerUrl(name, FideId); }
+}
+
+function customFunctionOnMove() {
+  var theObj;
+  if (showColorFlag) {
+    if (theObj = document.getElementById("whiteColorFlag")) {
+      theObj.style.display = "inline-block";
+      theObj.style.visibility = CurrentPly % 2 ? "hidden" : "visible";
+    }
+    if (theObj = document.getElementById("blackColorFlag")) {
+      theObj.style.display = "inline-block";
+      theObj.style.visibility = CurrentPly % 2 ? "visible" : "hidden";
+    }
+  }
 }
 
 function customFunctionOnPgnTextLoad() { document.getElementById('numGm').innerHTML = numberOfGames; }

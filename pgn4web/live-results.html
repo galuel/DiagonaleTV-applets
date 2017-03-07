@@ -3,7 +3,7 @@
 
 <!--
   pgn4web javascript chessboard
-  copyright (C) 2009-2015 Paolo Casaschi
+  copyright (C) 2009-2016 Paolo Casaschi
   see README file and http://pgn4web.casaschi.net
   for credits, license and more details
 -->
@@ -138,8 +138,11 @@ h1.pageHeader {
 .game {
   font-size: 14px; /* defined as game.fontSize */
   font-weight: normal;
-  margin-top: 0px;
+  margin-top: 6px;
   margin-bottom: 0px;
+}
+
+.gameItem {
   cursor: pointer;
 }
 
@@ -495,6 +498,9 @@ a.variation {
   var showLastMoves = false;
   if ((gup("showLastMoves") == "true") || (gup("showLastMoves") == "t")) { showLastMoves = true; }
 
+  var autoSwitchNewgames = false;
+  if ((gup("autoSwitchNewgames") == "true") || (gup("autoSwitchNewgames") == "t")) { autoSwitchNewgames = true; }
+
   var highlightMode = false;
   if ((gup("highlightMode") == "true") || (gup("highlightMoves") == "t") || (gup("highlightMode") == "border") || (gup("highlightMoves") == "b")) { highlightMode = true; }
 
@@ -522,6 +528,7 @@ a.variation {
       " - showTeams = " + showTeams + "; shows teams information (default true)" + "\n" +
       " - showPlayersInfo = " + showPlayersInfo + "; shows title/elo players information (default true)" + "\n" +
       " - showLastMoves = " + showLastMoves + "; shows last moves information (default false)" + "\n" +
+      " - autoSwitchNewgames = " + autoSwitchNewgames + "; automatically switches to games with new moves (default false)" + "\n" +
       " - highlightMode = " + highlightMode + "; highlight moves (default false)" + "\n" +
       " - autoUpdateAnalysis = " + autoUpdateAnalysis + "; automatically updates analysis board from main board (default false)" + "\n" +
       " - headlessPage = " + headlessPage + "; displays a page without heading (default false)" + "\n" +
@@ -565,7 +572,8 @@ a.variation {
   var gameBlackTitle;
   var gameWhiteElo;
   var gameBlackElo;
-  var gameMatch;
+  var gameMatchId;
+  var gameMatchKey;
   var gameBoard;
   var newGameLengthFromCrc = new Array();
   var gameLengthFromCrc = new Array();
@@ -582,9 +590,12 @@ a.variation {
     gameBlackTitle = new Array();
     gameWhiteElo = new Array();
     gameBlackElo = new Array();
-    gameMatch = new Array();
+    gameMatchId = new Array();
+    gameMatchKey = new Array();
+    gameMatchKey[0] = -1;
     gameBoard = new Array();
     gameNewMoves = new Array();
+    var maxCrc = 1000000;
     for (var gg = 0; gg < numberOfGames; gg++) {
       gameId[gg] = gg;
       gameWhiteTeam[gg] = customPgnHeaderTag("WhiteTeam", null, gg);
@@ -593,11 +604,12 @@ a.variation {
       gameBlackTitle[gg] = customPgnHeaderTag("BlackTitle", null, gg);
       gameWhiteElo[gg] = customPgnHeaderTag("WhiteElo", null, gg);
       gameBlackElo[gg] = customPgnHeaderTag("BlackElo", null, gg);
-      gameMatch[gg] = crc32(gameWhiteTeam[gg]) + crc32(gameBlackTeam[gg]);
+      gameMatchId[gg] = (gameWhiteTeam[gg] + gameBlackTeam[gg] !== "") ? ((crc32(gameWhiteTeam[gg]) + crc32(gameBlackTeam[gg])) % maxCrc) + maxCrc : 0;
+      if (typeof(gameMatchKey[gameMatchId[gg]]) == "undefined") { gameMatchKey[gameMatchId[gg]] = gg; }
       gameBoard[gg] = customPgnHeaderTag("Board", null, gg);
-      var thisCrc = (typeof(pgnHeader[gg]) == "string") ? (crc32((gameEvent[gg] + "," + gameSite[gg] + "," + gameRound[gg] + "," + gameWhite[gg] + "," + gameBlack[gg] + ";").replace(/(^\s*|\s*$)/g, "")) % 65535) + 65535 : 0;
+      var thisCrc = (typeof(pgnHeader[gg]) == "string") ? (crc32((gameEvent[gg] + "," + gameSite[gg] + "," + gameRound[gg] + "," + gameWhite[gg] + "," + gameBlack[gg] + ";").replace(/(^\s*|\s*$)/g, "")) % maxCrc) + maxCrc : 0;
       newGameLengthFromCrc[thisCrc] = LiveBroadcastDemo ? gameDemoMaxPly[gg] : pgnGame[gg].replace(/(^\s*|\s*$)/g, "").length;
-      gameNewMoves[gg] = ((newGameLengthFromCrc[thisCrc] !== gameLengthFromCrc[thisCrc]) && (LiveBroadcastStarted) && (!LiveBroadcastEnded));
+      gameNewMoves[gg] = ((newGameLengthFromCrc[thisCrc] !== gameLengthFromCrc[thisCrc]) && (LiveBroadcastStarted) && (LiveBroadcastTicker > 0) && (!LiveBroadcastEnded));
     }
     gameLengthFromCrc = newGameLengthFromCrc.splice(0, newGameLengthFromCrc.length);
     gameId.sort(sortGameId);
@@ -607,6 +619,8 @@ a.variation {
     if ((LiveBroadcastTicker < 2) && delayIniGame) {
       Init(typeof(gameId[iniGame - 1]) != "undefined" ? gameId[iniGame - 1] : "0");
     }
+
+    if (autoSwitchNewgames && ((typeof(gameNewMoves) == "undefined") || (!gameNewMoves[currentGame]))) { searchGameWithNewMoves(false); }
 
     if (firstCustomFunctionOnPgnTextLoad) {
       firstCustomFunctionOnPgnTextLoad = false;
@@ -618,7 +632,7 @@ a.variation {
   function myCompare(AA, ZZ) {
     if ((typeof(AA) == "undefined") && (typeof(ZZ) == "undefined")) { return 0; }
     if (typeof(ZZ) == "undefined") { return 1; }
-    if (typeof(ZZ) == "undefined") { return -1; }
+    if (typeof(AA) == "undefined") { return -1; }
     if (AA > ZZ) { return 1; }
     if (AA < ZZ) { return -1; }
     return 0;
@@ -656,7 +670,7 @@ a.variation {
     res = myCompareRound(fixRound(gameRound[aa]), fixRound(gameRound[zz]));
     if (res !== 0) { return roundReverse ? -res : res; }
 
-    res = myCompare(gameMatch[aa], gameMatch[zz]);
+    res = myCompare(gameMatchKey[gameMatchId[aa]], gameMatchKey[gameMatchId[zz]]);
     if (res !== 0) { return res; }
 
     res = myCompareRound(gameRound[aa], gameRound[zz]);
@@ -677,9 +691,11 @@ a.variation {
   }
 
   function printGames() {
+    firstTeam = "";
+    secondTeam = "";
     var firstRow = true;
     var lastEventRound = "";
-    var lastMatch = 0;
+    var lastMatchId = 0;
     var theObj = document.getElementById("results");
     if (theObj) {
       var resultTable = "";
@@ -692,12 +708,12 @@ a.variation {
           resultTable += '<div class="eventRound"' + (firstRow ? ' style="margin-top:0px;"' : '') + '><span class="event" title="' + gameEvent[ggId] + '">' + gameEvent[ggId] + '</span><span class="round" title="' + 'round ' + fixedRound + '">' + fixedRound + '</span></div>';
           if (firstRow) { firstRow = false; }
           lastEventRound = currentEventRound;
-          lastMatch = 0;
+          lastMatchId = 0;
         }
-        if (showTeams && gameMatch[ggId] && (gameMatch[ggId] !== lastMatch)) {
-          resultTable += matchRow(gameEvent[ggId], gameRound[ggId], gameMatch[ggId], firstRow);
+        if (showTeams && gameMatchId[ggId] && (gameMatchId[ggId] !== lastMatchId)) {
+          resultTable += matchRow(gameEvent[ggId], gameRound[ggId], gameMatchId[ggId], firstRow);
           if (firstRow) { firstRow = false; }
-          lastMatch = gameMatch[ggId];
+          lastMatchId = gameMatchId[ggId];
         }
         whiteTitle = gameWhiteTitle[ggId];
         whiteElo = gameWhiteElo[ggId];
@@ -709,7 +725,7 @@ a.variation {
           lastMoves = pgnGame[ggId].replace(/\n/g, " ").replace(/{.*?}|\$\d+/g, " ").replace(/[^\sa-wyzA-WYZ0-9.\/#-]+/g, "").replace(/\d+\.{2,}|1-0|0-1|1\/2-1\/2|\*/g, "").match(/((\b\d+\.?)?(\s*\S+)?(\s*\S+)|(\S+\s*)?(\b\d+\.?)?(\s*\S+))\s*$/);
           if (lastMoves) { lastMoves = lastMoves[0].replace(/\s\s+/g, " ").replace(/^\s+|\s+$/g, ""); }
         }
-        resultTable += '<div class="game" id="gameRow_' + ggId + '" style="' + ((showBoard && (ggId === oldSelectedGame)) ? 'font-weight:bold;' : '') + (firstRow ? 'margin-top:0px;' : '') + '"><span onclick="selectGame(' + ggId + ');"><span class="player"><span class="firstPlayer' + ((firstTeam && gameWhiteTeam[ggId] === firstTeam) ? ' firstTeamPlayer' : '') + ((secondTeam && gameWhiteTeam[ggId] === secondTeam) ? ' secondTeamPlayer' : '') + '" title="' + whitePlayer.replace(/&nbsp;/, ' ') + '">' + whitePlayer + '</span></span><span class="player"><span class="secondPlayer' + ((firstTeam && gameWhiteTeam[ggId] === firstTeam) ? ' firstTeamPlayer' : '') + ((secondTeam && gameBlackTeam[ggId] === secondTeam) ? ' secondTeamPlayer' : '') + '" title="' + blackPlayer.replace(/&nbsp;/, ' ') + '">' + blackPlayer + '</span></span><span class="result" title="' + gameResult[ggId] + '">' + gameResult[ggId] + '</span><span id="newMoves_' + ggId + '" class="' + (gameNewMoves[ggId] ? 'newMoves' : 'noNewMoves') + '" title="new moves received">*</span><span class="lastMoves"><span' + (lastMoves ? ' title="last moves">' + lastMoves : '>&nbsp;')  + '</span></span></span></div>';
+        resultTable += '<div class="game" id="gameRow_' + ggId + '" style="' + ((showBoard && (ggId === oldSelectedGame)) ? 'font-weight:bold;' : '') + (firstRow ? 'margin-top:0px;' : '') + '"><span class="gameItem" onclick="selectGame(' + ggId + ');"><span class="player"><span class="firstPlayer' + ((firstTeam && gameWhiteTeam[ggId] === firstTeam) ? ' firstTeamPlayer' : '') + ((secondTeam && gameWhiteTeam[ggId] === secondTeam) ? ' secondTeamPlayer' : '') + '" title="' + whitePlayer.replace(/&nbsp;/, ' ') + '">' + whitePlayer + '</span></span><span class="player"><span class="secondPlayer' + ((firstTeam && gameBlackTeam[ggId] === firstTeam) ? ' firstTeamPlayer' : '') + ((secondTeam && gameBlackTeam[ggId] === secondTeam) ? ' secondTeamPlayer' : '') + '" title="' + blackPlayer.replace(/&nbsp;/, ' ') + '">' + blackPlayer + '</span></span><span class="result" title="' + gameResult[ggId] + '">' + gameResult[ggId] + '</span><span id="newMoves_' + ggId + '" class="' + (gameNewMoves[ggId] ? 'newMoves' : 'noNewMoves') + '" title="new moves received">*</span><span class="lastMoves"><span' + (lastMoves ? ' title="last moves">' + lastMoves : '>&nbsp;')  + '</span></span></span></div>';
         if (firstRow) { firstRow = false; }
       }
       theObj.innerHTML = resultTable;
@@ -725,7 +741,7 @@ a.variation {
     var firstTeamScore = 0;
     var secondTeamScore = 0;
     for (var ii in gameId) {
-      if ((gameEvent[gameId[ii]] === eventStr) && (fixRound(gameRound[gameId[ii]]) === fixRound(roundStr)) && (gameMatch[gameId[ii]] === matchId)) {
+      if ((gameEvent[gameId[ii]] === eventStr) && (fixRound(gameRound[gameId[ii]]) === fixRound(roundStr)) && (gameMatchId[gameId[ii]] === matchId)) {
         if (!firstTeam || !secondTeam) {
           firstTeam = gameWhiteTeam[gameId[ii]];
           secondTeam = gameBlackTeam[gameId[ii]];
@@ -860,7 +876,7 @@ a.variation {
   }
 
   function customDebugInfo() {
-    return "roundReverse=" + b2s(roundReverse);
+    return "autoSwitchNewgames=" + b2s(autoSwitchNewgames) + " roundReverse=" + b2s(roundReverse);
   }
   function b2s(b) { return b ? "true" : "false"; }
 
@@ -886,7 +902,8 @@ a.variation {
   if (LiveBroadcastDelay > 0) {
     boardShortcut("B7", "search previous game with new moves", function(t,e){ searchGameWithNewMoves(true); });
     boardShortcut("C7", "search next game with new moves", function(t,e){ searchGameWithNewMoves(false); });
-  }
+    boardShortcut("G7", "toggle autoswitch to games with new moves", function(t,e){ autoSwitchNewgames = !autoSwitchNewgames && !e.shiftKey; });
+  } else { clearShortcutSquares("G", "7"); }
   clearShortcutSquares("F", "7");
 
   if (!pgn4web_engineWindowDisableAnalysisBoard) {

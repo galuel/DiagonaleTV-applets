@@ -3,7 +3,7 @@
 
 <!--
   pgn4web javascript chessboard
-  copyright (C) 2009-2015 Paolo Casaschi
+  copyright (C) 2009-2016 Paolo Casaschi
   see README file and http://pgn4web.casaschi.net
   for credits, license and more details
 -->
@@ -806,7 +806,7 @@ if ((window.parent !== window) && (!engineWinPrepareIdle)) {
 }
 
 function updateBareShortcut() {
-  boardShortcut("G5", bare ? "unhide game info\n\n" + gameTooltipInfo() : "maximize chessboard and hide game info", function(t,e){ toggleBareChessboard(); });
+  boardShortcut("G5", bare ? "unhide game info\n\n" + gameTooltipInfo() : "maximize chessboard and hide game info", function(t,e){ if (e.shiftKey) { alert(gameTooltipInfo()); } else { toggleBareChessboard(); } });
 }
 
 function meaningfulHeader(tagValue) {

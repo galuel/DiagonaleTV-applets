@@ -10,11 +10,7 @@ set +o posix
 
 pgn4webVer=$(grep "var pgn4web_version = " pgn4web.js | awk -F "'" '{print$2}')
 
-if [ "$1" == "full" ]; then
-  pgn4webFilename="pgn4web-full-$pgn4webVer.zip"
-else
-  pgn4webFilename="pgn4web-$pgn4webVer.zip"
-fi
+pgn4webFilename="pgn4web-$pgn4webVer.zip"
 
 if [ -e ../"$pgn4webFilename" ]; then
   echo "Error: pgn4web package already exists (../$pgn4webFilename)"
@@ -30,13 +26,7 @@ fi
 ln -s "$(pwd)" ../"$pgn4webDirectory"
 
 cd ..
-zip -9r "$pgn4webFilename" "$pgn4webDirectory" -x *.svn/* -x "$pgn4webDirectory"/jsl.conf -x "$pgn4webDirectory"/live-games-app* -x "$pgn4webDirectory"/live/\* -x "$pgn4webDirectory"/live/ -x "$pgn4webDirectory"/paolo/\* -x "$pgn4webDirectory"/paolo/
-
-if [ "$1" == "full" ]; then
-  zip -9r "$pgn4webFilename" "$pgn4webDirectory"/live-games-app* "$pgn4webDirectory"/live/* -x *.svn/*
-else
-  zip -9r "$pgn4webFilename" "$pgn4webDirectory"/live/*.html "$pgn4webDirectory"/live/*.pgn "$pgn4webDirectory"/live/live-simulation.sh -x *.svn/*
-fi
+zip -9r "$pgn4webFilename" "$pgn4webDirectory" -x *.svn/*
 
 rm $pgn4webDirectory
 
